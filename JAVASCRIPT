@@ -1,0 +1,92 @@
+// Datos base
+let productos = {
+  1: { id: 1, nombre: "Mouse", precio: 30000 },
+  2: { id: 2, nombre: "Teclado", precio: 60000 },
+  3: { id: 3, nombre: "Monitor", precio: 200000 }
+};
+
+let setProductos = new Set(Object.values(productos));
+
+let mapCategorias = new Map([
+  ["Periféricos", "Mouse"],
+  ["Entrada", "Teclado"],
+  ["Pantalla", "Monitor"]
+]);
+
+// DOM
+const form = document.getElementById("formulario-producto");
+const nombreInput = document.getElementById("nombre");
+const precioInput = document.getElementById("precio");
+const listaDOM = document.getElementById("lista");
+
+// Renderizar productos en el DOM
+function renderizarLista() {
+  listaDOM.innerHTML = "";
+  for (let key in productos) {
+    const { nombre, precio } = productos[key];
+    const li = document.createElement("li");
+    li.textContent = `${nombre} - $${precio}`;
+    listaDOM.appendChild(li);
+  }
+}
+
+// Validar datos
+function validarProducto(nuevoProducto) {
+  if (!nuevoProducto.nombre || !nuevoProducto.precio) return false;
+
+  for (let key in productos) {
+    if (productos[key].nombre.toLowerCase() === nuevoProducto.nombre.toLowerCase()) {
+      return false; // ya existe por nombre
+    }
+  }
+  return true;
+}
+
+// Agregar producto desde el DOM
+form.addEventListener("submit", (e) => {
+  e.preventDefault();
+
+  const nombre = nombreInput.value.trim();
+  const precio = parseInt(precioInput.value);
+
+  const nuevoProducto = {
+    id: Object.keys(productos).length + 1,
+    nombre,
+    precio
+  };
+
+  if (!validarProducto(nuevoProducto)) {
+    alert("Datos inválidos o producto duplicado.");
+    return;
+  }
+
+  // Agregar a estructuras
+  productos[nuevoProducto.id] = nuevoProducto;
+  setProductos.add(nuevoProducto);
+  mapCategorias.set("Otros", nombre); // Ejemplo de categoría genérica
+
+  renderizarLista();
+
+  // Limpiar formulario
+  form.reset();
+});
+
+// Mostrar productos y estructuras en consola
+console.log("🧾 Objetos:");
+for (let key in productos) {
+  const p = productos[key];
+  console.log(`ID: ${p.id}, ${p.nombre}, $${p.precio}`);
+}
+
+console.log("\n✅ Set:");
+for (let p of setProductos) {
+  console.log(`${p.nombre} - $${p.precio}`);
+}
+
+console.log("\n📂 Map:");
+mapCategorias.forEach((prod, cat) => {
+  console.log(`Categoría: ${cat} -> Producto: ${prod}`);
+});
+
+// Inicializar visual
+renderizarLista();
